@@ -17,25 +17,62 @@ function useIsMobile() {
   return isMobile;
 }
 
-/* ─── Mouse/touch tracker (normalized -1 to 1) ─── */
+/* ─── Mouse/gyroscope tracker (normalized -1 to 1) ─── */
 function useMousePosition() {
   const mouse = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
+  const gyroEnabled = useRef(false);
 
   useEffect(() => {
+    // Desktop: mouse tracking
     const handleMouseMove = (e: MouseEvent) => {
       mouse.current.targetX = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.current.targetY = -(e.clientY / window.innerHeight) * 2 + 1;
     };
-    const handleTouchMove = (e: TouchEvent) => {
-      const t = e.touches[0];
-      mouse.current.targetX = (t.clientX / window.innerWidth) * 2 - 1;
-      mouse.current.targetY = -(t.clientY / window.innerHeight) * 2 + 1;
+
+    // Mobile: gyroscope tracking via DeviceOrientation
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      if (e.gamma === null || e.beta === null) return;
+      gyroEnabled.current = true;
+      // gamma: left-right tilt (-90 to 90), map ±30° to -1..1
+      const x = Math.max(-1, Math.min(1, e.gamma / 30));
+      // beta: front-back tilt (0=flat, 90=upright), center around 45° (natural hold angle)
+      const y = Math.max(-1, Math.min(1, (e.beta - 45) / 30));
+      mouse.current.targetX = x;
+      mouse.current.targetY = -y;
     };
+
+    // iOS requires a permission popup for gyro — skip it entirely.
+    // Only enable gyro on Android/other where no popup is needed.
+    const requestGyroPermission = () => {
+      const DOE = DeviceOrientationEvent as unknown as {
+        requestPermission?: () => Promise<string>;
+      };
+      if (typeof DOE.requestPermission === "function") {
+        // iOS — don't request, no popup
+        return;
+      }
+      // Android / non-iOS — just start listening (no popup)
+      window.addEventListener("deviceorientation", handleOrientation, true);
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+
+    // Check if we're on a touch device and request gyro
+    if ("ontouchstart" in window) {
+      // On iOS, permission must be triggered by a user gesture.
+      // We'll try on first touch. If already granted (Android), it works immediately.
+      const onFirstTouch = () => {
+        requestGyroPermission();
+        window.removeEventListener("touchstart", onFirstTouch);
+      };
+      window.addEventListener("touchstart", onFirstTouch, { once: true });
+      // Also try immediately for Android
+      requestGyroPermission();
+    }
+
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("deviceorientation", handleOrientation, true);
     };
   }, []);
 
