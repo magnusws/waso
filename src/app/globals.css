@@ -1,26 +1,136 @@
 @import "tailwindcss";
 
+/* ─── Design tokens — definert som vanlige CSS custom properties ─── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-editorial: 'Instrument Serif', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
+
+  --color-bg: #fff3d3;
+  --color-bg-warm: #ffebb0;
+  --color-bg-dark: #0f0e0d;
+  --color-text: #000000;
+  --color-text-muted: rgba(0, 0, 0, 0.65);
+  --color-text-light: rgba(0, 0, 0, 0.25);
+  --color-accent: #000000;
+  --color-accent-fg: #ffffff;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-dark: rgba(255, 243, 211, 0.1);
+  --color-overlay: rgba(33, 29, 29, 0.55);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base — no scroll one-pager ─── */
+html, body {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  height: 100%;
+  height: 100svh;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+::selection {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+}
+
+/* ─── Typography utilities ─── */
+.font-editorial {
+  font-family: var(--font-editorial);
+  text-shadow: 0 0 32px rgba(255, 243, 211, 0.95), 0 0 64px rgba(255, 243, 211, 0.6);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+  text-shadow: 0 0 24px rgba(255, 243, 211, 0.9), 0 0 48px rgba(255, 243, 211, 0.5);
+}
+
+.text-light {
+  color: var(--color-text-light);
+}
+
+/* Borders */
+.border-waso {
+  border-color: var(--color-border);
+}
+
+/* ─── Pill button utility ─── */
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-pill-dark {
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+}
+
+.btn-pill-dark:hover {
+  opacity: 0.8;
+  transform: translateY(-1px);
+}
+
+.btn-pill-outline {
+  background: transparent;
+  color: var(--color-text);
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+}
+
+.btn-pill-outline:hover {
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+  border-color: var(--color-accent);
+}
+
+/* ─── Company link — animated underline ─── */
+.company-link {
+  color: var(--color-text);
+  text-decoration: none;
+  font-weight: 600;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.company-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1.5px;
+  background: var(--color-text);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.company-link:hover::after {
+  transform: scaleX(1);
+}
+
+/* ─── 3D Canvas layer ─── */
+canvas {
+  display: block;
 }
