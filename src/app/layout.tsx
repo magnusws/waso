@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "WASO — Design & Strategi",
+  title: "WASO — Magnus Walberg Solbakken",
   description:
     "Bedre produkter, gjort riktig. WASO er designpraksisen til Magnus Walberg Solbakken.",
   openGraph: {
-    title: "WASO — Design & Strategi",
+    title: "WASO — Magnus Walberg Solbakken",
     description:
       "Bedre produkter, gjort riktig.",
     type: "website",

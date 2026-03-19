@@ -131,7 +131,7 @@ function AnimatedBlob({
           distortionScale={0.2}
           temporalDistortion={0.1}
           roughness={0.05}
-          color="#f5e6c8"
+          color="#e8e8e8"
           transmission={0.95}
           ior={1.5}
         />
@@ -145,9 +145,9 @@ function AnimatedBlob({
         color={config.color}
         roughness={config.roughness}
         metalness={config.metalness}
-        clearcoat={0.3}
-        clearcoatRoughness={0.4}
-        envMapIntensity={0.8}
+        clearcoat={0.5}
+        clearcoatRoughness={0.2}
+        envMapIntensity={1.2}
       />
     </mesh>
   );
@@ -172,55 +172,56 @@ function SceneContent() {
   const groupRef = useRef<THREE.Group>(null);
   const { viewport } = useThree();
 
-  const aspectScale = useMemo(() => {
+  // For portrait viewports, compress X positions to fit narrow screen
+  const mobileCompression = useMemo(() => {
     const aspect = viewport.width / viewport.height;
-    if (aspect < 0.7) return 1.6;
-    if (aspect < 1) return 1.35;
-    return 1;
+    if (aspect < 0.7) return { scaleX: 0.45, scaleY: 0.75, groupScale: 1.4 };
+    if (aspect < 1) return { scaleX: 0.55, scaleY: 0.85, groupScale: 1.25 };
+    return { scaleX: 1, scaleY: 1, groupScale: 1 };
   }, [viewport.width, viewport.height]);
 
   // Warm cream palette
   const palette = useMemo(() => ({
-    ocher: "#d4a96a",
-    terracotta: "#c9845a",
-    golden: "#e0c88a",
-    caramel: "#b8956e",
-    amber: "#e8b86d",
-    warmTan: "#c4a882",
-    honey: "#d9b87a",
-    sienna: "#be8055",
-    cream: "#f5e6c8",
-    sand: "#e8d4a8",
+    matteWhite: "#e8e8e8",
+    silver: "#b8b8b8",
+    coolGrey: "#9a9a9a",
+    slate: "#6e6e6e",
+    charcoal: "#3a3a3a",
+    fog: "#d4d4d4",
+    pearl: "#f0eded",
+    stone: "#a8a8a8",
+    ash: "#c8c8c8",
+    graphite: "#585858",
   }), []);
 
   // Define all objects
   const objectConfigs = useMemo<ObjectConfig[]>(() => [
     // Large corner blobs
-    { basePos: [-7, 3.5, -2], scale: 2.8, color: palette.cream, roughness: 0.15, metalness: 0.05, shape: "sphere", floatFreqX: 0.13, floatFreqY: 0.17, floatFreqZ: 0.11, floatAmpX: 0.15, floatAmpY: 0.12, floatAmpZ: 0.08, rotSpeed: 0.08 },
-    { basePos: [7.5, -3, -1.5], scale: 1.8, scaleVec: [2.2, 1.4, 1.8], color: palette.ocher, roughness: 0.25, metalness: 0.1, shape: "icosahedron", floatFreqX: 0.11, floatFreqY: 0.14, floatFreqZ: 0.09, floatAmpX: 0.12, floatAmpY: 0.10, floatAmpZ: 0.07, rotSpeed: 0.06 },
-    { basePos: [6.5, 3.5, -1], scale: 2.0, color: palette.terracotta, roughness: 0.3, metalness: 0.15, shape: "sphere", floatFreqX: 0.15, floatFreqY: 0.12, floatFreqZ: 0.10, floatAmpX: 0.14, floatAmpY: 0.11, floatAmpZ: 0.09, rotSpeed: 0.07 },
-    { basePos: [-6.5, -3.8, 0], scale: 2.2, color: palette.sand, roughness: 0.2, metalness: 0.1, shape: "sphere", floatFreqX: 0.10, floatFreqY: 0.16, floatFreqZ: 0.12, floatAmpX: 0.13, floatAmpY: 0.10, floatAmpZ: 0.08, rotSpeed: 0.05 },
+    { basePos: [-7, 3.5, -2], scale: 2.8, color: palette.pearl, roughness: 0.1, metalness: 0.05, shape: "sphere", floatFreqX: 0.13, floatFreqY: 0.17, floatFreqZ: 0.11, floatAmpX: 0.15, floatAmpY: 0.12, floatAmpZ: 0.08, rotSpeed: 0.08 },
+    { basePos: [7.5, -3, -1.5], scale: 1.8, scaleVec: [2.2, 1.4, 1.8], color: palette.slate, roughness: 0.15, metalness: 0.6, shape: "icosahedron", floatFreqX: 0.11, floatFreqY: 0.14, floatFreqZ: 0.09, floatAmpX: 0.12, floatAmpY: 0.10, floatAmpZ: 0.07, rotSpeed: 0.06 },
+    { basePos: [6.5, 3.5, -1], scale: 2.0, color: palette.coolGrey, roughness: 0.25, metalness: 0.4, shape: "sphere", floatFreqX: 0.15, floatFreqY: 0.12, floatFreqZ: 0.10, floatAmpX: 0.14, floatAmpY: 0.11, floatAmpZ: 0.09, rotSpeed: 0.07 },
+    { basePos: [-6.5, -3.8, 0], scale: 2.2, color: palette.fog, roughness: 0.2, metalness: 0.1, shape: "sphere", floatFreqX: 0.10, floatFreqY: 0.16, floatFreqZ: 0.12, floatAmpX: 0.13, floatAmpY: 0.10, floatAmpZ: 0.08, rotSpeed: 0.05 },
     // Mid-size orbit
-    { basePos: [-4.5, -3, 1], scale: 1.4, color: palette.golden, roughness: 0.2, metalness: 0.1, shape: "capsule", floatFreqX: 0.18, floatFreqY: 0.22, floatFreqZ: 0.15, floatAmpX: 0.18, floatAmpY: 0.15, floatAmpZ: 0.10, rotSpeed: 0.12 },
-    { basePos: [4.5, 4, 0.5], scale: 1.2, color: palette.caramel, roughness: 0.35, metalness: 0.1, shape: "pill", floatFreqX: 0.20, floatFreqY: 0.15, floatFreqZ: 0.18, floatAmpX: 0.16, floatAmpY: 0.14, floatAmpZ: 0.09, rotSpeed: 0.10 },
-    { basePos: [8, 0.5, -2], scale: 1.2, scaleVec: [1.5, 1.0, 1.2], color: palette.amber, roughness: 0.2, metalness: 0.2, shape: "octahedron", floatFreqX: 0.14, floatFreqY: 0.19, floatFreqZ: 0.11, floatAmpX: 0.12, floatAmpY: 0.10, floatAmpZ: 0.07, rotSpeed: 0.07 },
-    { basePos: [-8, 1, -1.5], scale: 1.1, color: palette.warmTan, roughness: 0.15, metalness: 0.1, shape: "sphere", floatFreqX: 0.22, floatFreqY: 0.16, floatFreqZ: 0.19, floatAmpX: 0.18, floatAmpY: 0.15, floatAmpZ: 0.11, rotSpeed: 0.13 },
+    { basePos: [-4.5, -3, 1], scale: 1.4, color: palette.silver, roughness: 0.1, metalness: 0.7, shape: "capsule", floatFreqX: 0.18, floatFreqY: 0.22, floatFreqZ: 0.15, floatAmpX: 0.18, floatAmpY: 0.15, floatAmpZ: 0.10, rotSpeed: 0.12 },
+    { basePos: [4.5, 4, 0.5], scale: 1.2, color: palette.ash, roughness: 0.3, metalness: 0.2, shape: "pill", floatFreqX: 0.20, floatFreqY: 0.15, floatFreqZ: 0.18, floatAmpX: 0.16, floatAmpY: 0.14, floatAmpZ: 0.09, rotSpeed: 0.10 },
+    { basePos: [8, 0.5, -2], scale: 1.2, scaleVec: [1.5, 1.0, 1.2], color: palette.graphite, roughness: 0.1, metalness: 0.8, shape: "octahedron", floatFreqX: 0.14, floatFreqY: 0.19, floatFreqZ: 0.11, floatAmpX: 0.12, floatAmpY: 0.10, floatAmpZ: 0.07, rotSpeed: 0.07 },
+    { basePos: [-8, 1, -1.5], scale: 1.1, color: palette.matteWhite, roughness: 0.15, metalness: 0.05, shape: "sphere", floatFreqX: 0.22, floatFreqY: 0.16, floatFreqZ: 0.19, floatAmpX: 0.18, floatAmpY: 0.15, floatAmpZ: 0.11, rotSpeed: 0.13 },
     // Torus / ring shapes
-    { basePos: [-3.5, 4.5, -1], scale: 1.1, color: palette.honey, roughness: 0.2, metalness: 0.3, shape: "torus", floatFreqX: 0.16, floatFreqY: 0.13, floatFreqZ: 0.20, floatAmpX: 0.14, floatAmpY: 0.12, floatAmpZ: 0.08, rotSpeed: 0.15 },
-    { basePos: [3.5, -4.5, 0], scale: 1.2, color: palette.sienna, roughness: 0.25, metalness: 0.1, shape: "donut", floatFreqX: 0.12, floatFreqY: 0.18, floatFreqZ: 0.14, floatAmpX: 0.13, floatAmpY: 0.11, floatAmpZ: 0.09, rotSpeed: 0.09 },
-    { basePos: [0, -5, -1.5], scale: 0.9, color: palette.terracotta, roughness: 0.3, metalness: 0.1, shape: "torus", floatFreqX: 0.19, floatFreqY: 0.14, floatFreqZ: 0.17, floatAmpX: 0.15, floatAmpY: 0.13, floatAmpZ: 0.10, rotSpeed: 0.11 },
+    { basePos: [-3.5, 4.5, -1], scale: 1.1, color: palette.stone, roughness: 0.15, metalness: 0.5, shape: "torus", floatFreqX: 0.16, floatFreqY: 0.13, floatFreqZ: 0.20, floatAmpX: 0.14, floatAmpY: 0.12, floatAmpZ: 0.08, rotSpeed: 0.15 },
+    { basePos: [3.5, -4.5, 0], scale: 1.2, color: palette.charcoal, roughness: 0.2, metalness: 0.6, shape: "donut", floatFreqX: 0.12, floatFreqY: 0.18, floatFreqZ: 0.14, floatAmpX: 0.13, floatAmpY: 0.11, floatAmpZ: 0.09, rotSpeed: 0.09 },
+    { basePos: [0, -5, -1.5], scale: 0.9, color: palette.silver, roughness: 0.1, metalness: 0.7, shape: "torus", floatFreqX: 0.19, floatFreqY: 0.14, floatFreqZ: 0.17, floatAmpX: 0.15, floatAmpY: 0.13, floatAmpZ: 0.10, rotSpeed: 0.11 },
     // Smaller accent shapes
-    { basePos: [-8.5, 4, -3.5], scale: 0.8, color: palette.sand, roughness: 0.1, metalness: 0.1, shape: "sphere", floatFreqX: 0.25, floatFreqY: 0.20, floatFreqZ: 0.22, floatAmpX: 0.20, floatAmpY: 0.18, floatAmpZ: 0.12, rotSpeed: 0.16 },
-    { basePos: [8.5, -4, -2.5], scale: 0.7, color: palette.ocher, roughness: 0.2, metalness: 0.1, shape: "capsule", floatFreqX: 0.21, floatFreqY: 0.17, floatFreqZ: 0.24, floatAmpX: 0.18, floatAmpY: 0.16, floatAmpZ: 0.10, rotSpeed: 0.14 },
-    { basePos: [2, -5, -1.5], scale: 0.75, color: palette.terracotta, roughness: 0.3, metalness: 0.1, shape: "cone", floatFreqX: 0.17, floatFreqY: 0.23, floatFreqZ: 0.13, floatAmpX: 0.16, floatAmpY: 0.14, floatAmpZ: 0.09, rotSpeed: 0.12 },
-    { basePos: [-5.5, 5, -2.5], scale: 0.65, color: palette.golden, roughness: 0.15, metalness: 0.1, shape: "pill", floatFreqX: 0.23, floatFreqY: 0.19, floatFreqZ: 0.21, floatAmpX: 0.19, floatAmpY: 0.17, floatAmpZ: 0.11, rotSpeed: 0.17 },
-    { basePos: [6.5, 5, -1.5], scale: 0.55, color: palette.honey, roughness: 0.2, metalness: 0.1, shape: "sphere", floatFreqX: 0.26, floatFreqY: 0.21, floatFreqZ: 0.18, floatAmpX: 0.22, floatAmpY: 0.18, floatAmpZ: 0.13, rotSpeed: 0.18 },
-    { basePos: [-2, 5.5, -2], scale: 0.5, color: palette.caramel, roughness: 0.25, metalness: 0.1, shape: "torus", floatFreqX: 0.20, floatFreqY: 0.25, floatFreqZ: 0.16, floatAmpX: 0.17, floatAmpY: 0.15, floatAmpZ: 0.10, rotSpeed: 0.15 },
-    { basePos: [2, 5, -1], scale: 0.55, color: palette.amber, roughness: 0.2, metalness: 0.1, shape: "sphere", floatFreqX: 0.24, floatFreqY: 0.18, floatFreqZ: 0.22, floatAmpX: 0.20, floatAmpY: 0.16, floatAmpZ: 0.12, rotSpeed: 0.14 },
+    { basePos: [-8.5, 4, -3.5], scale: 0.8, color: palette.fog, roughness: 0.08, metalness: 0.1, shape: "sphere", floatFreqX: 0.25, floatFreqY: 0.20, floatFreqZ: 0.22, floatAmpX: 0.20, floatAmpY: 0.18, floatAmpZ: 0.12, rotSpeed: 0.16 },
+    { basePos: [8.5, -4, -2.5], scale: 0.7, color: palette.coolGrey, roughness: 0.1, metalness: 0.5, shape: "capsule", floatFreqX: 0.21, floatFreqY: 0.17, floatFreqZ: 0.24, floatAmpX: 0.18, floatAmpY: 0.16, floatAmpZ: 0.10, rotSpeed: 0.14 },
+    { basePos: [2, -5, -1.5], scale: 0.75, color: palette.slate, roughness: 0.2, metalness: 0.6, shape: "cone", floatFreqX: 0.17, floatFreqY: 0.23, floatFreqZ: 0.13, floatAmpX: 0.16, floatAmpY: 0.14, floatAmpZ: 0.09, rotSpeed: 0.12 },
+    { basePos: [-5.5, 5, -2.5], scale: 0.65, color: palette.ash, roughness: 0.12, metalness: 0.3, shape: "pill", floatFreqX: 0.23, floatFreqY: 0.19, floatFreqZ: 0.21, floatAmpX: 0.19, floatAmpY: 0.17, floatAmpZ: 0.11, rotSpeed: 0.17 },
+    { basePos: [6.5, 5, -1.5], scale: 0.55, color: palette.matteWhite, roughness: 0.15, metalness: 0.1, shape: "sphere", floatFreqX: 0.26, floatFreqY: 0.21, floatFreqZ: 0.18, floatAmpX: 0.22, floatAmpY: 0.18, floatAmpZ: 0.13, rotSpeed: 0.18 },
+    { basePos: [-2, 5.5, -2], scale: 0.5, color: palette.graphite, roughness: 0.1, metalness: 0.7, shape: "torus", floatFreqX: 0.20, floatFreqY: 0.25, floatFreqZ: 0.16, floatAmpX: 0.17, floatAmpY: 0.15, floatAmpZ: 0.10, rotSpeed: 0.15 },
+    { basePos: [2, 5, -1], scale: 0.55, color: palette.stone, roughness: 0.2, metalness: 0.4, shape: "sphere", floatFreqX: 0.24, floatFreqY: 0.18, floatFreqZ: 0.22, floatAmpX: 0.20, floatAmpY: 0.16, floatAmpZ: 0.12, rotSpeed: 0.14 },
     // Glass blobs
-    { basePos: [5, 2, 1.5], scale: 1.4, color: "#f5e6c8", roughness: 0.05, metalness: 0, shape: "sphere", floatFreqX: 0.12, floatFreqY: 0.16, floatFreqZ: 0.10, floatAmpX: 0.10, floatAmpY: 0.08, floatAmpZ: 0.06, rotSpeed: 0.06, isGlass: true },
-    { basePos: [-5, -2, 1], scale: 1.0, color: "#f5e6c8", roughness: 0.05, metalness: 0, shape: "donut", floatFreqX: 0.14, floatFreqY: 0.11, floatFreqZ: 0.15, floatAmpX: 0.12, floatAmpY: 0.10, floatAmpZ: 0.07, rotSpeed: 0.08, isGlass: true },
-    { basePos: [3, -3.5, 2], scale: 0.7, color: "#f5e6c8", roughness: 0.05, metalness: 0, shape: "sphere", floatFreqX: 0.18, floatFreqY: 0.14, floatFreqZ: 0.20, floatAmpX: 0.14, floatAmpY: 0.12, floatAmpZ: 0.08, rotSpeed: 0.10, isGlass: true },
+    { basePos: [5, 2, 1.5], scale: 1.4, color: "#e0e0e0", roughness: 0.05, metalness: 0, shape: "sphere", floatFreqX: 0.12, floatFreqY: 0.16, floatFreqZ: 0.10, floatAmpX: 0.10, floatAmpY: 0.08, floatAmpZ: 0.06, rotSpeed: 0.06, isGlass: true },
+    { basePos: [-5, -2, 1], scale: 1.0, color: "#e0e0e0", roughness: 0.05, metalness: 0, shape: "donut", floatFreqX: 0.14, floatFreqY: 0.11, floatFreqZ: 0.15, floatAmpX: 0.12, floatAmpY: 0.10, floatAmpZ: 0.07, rotSpeed: 0.08, isGlass: true },
+    { basePos: [3, -3.5, 2], scale: 0.7, color: "#e0e0e0", roughness: 0.05, metalness: 0, shape: "sphere", floatFreqX: 0.18, floatFreqY: 0.14, floatFreqZ: 0.20, floatAmpX: 0.14, floatAmpY: 0.12, floatAmpZ: 0.08, rotSpeed: 0.10, isGlass: true },
   ], [palette]);
 
   // Create refs for all meshes
@@ -244,13 +245,14 @@ function SceneContent() {
 
     // 1. Apply sine-wave floating animation to each mesh (amplified)
     const ampScale = 1.5; // boost all float amplitudes
+    const { scaleX, scaleY } = mobileCompression;
     for (let i = 0; i < objectConfigs.length; i++) {
       const mesh = meshRefs.current[i];
       if (!mesh) continue;
       const c = objectConfigs[i];
       mesh.position.set(
-        c.basePos[0] + Math.sin(t * c.floatFreqX) * c.floatAmpX * ampScale,
-        c.basePos[1] + Math.sin(t * c.floatFreqY + 1.5) * c.floatAmpY * ampScale,
+        (c.basePos[0] + Math.sin(t * c.floatFreqX) * c.floatAmpX * ampScale) * scaleX,
+        (c.basePos[1] + Math.sin(t * c.floatFreqY + 1.5) * c.floatAmpY * ampScale) * scaleY,
         c.basePos[2] + Math.sin(t * c.floatFreqZ + 3.0) * c.floatAmpZ * ampScale,
       );
       // Gentle rotation
@@ -291,15 +293,15 @@ function SceneContent() {
     <>
       <CameraRig mouse={mouse} isMobile={isMobile} />
 
-      {/* Lighting */}
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[10, 10, 5]} intensity={1.2} color="#fff5e6" />
-      <directionalLight position={[-5, -5, -5]} intensity={0.4} color="#ffd4a8" />
-      <pointLight position={[0, 5, 0]} intensity={0.5} color="#ffe0b0" />
+      {/* Lighting — cool white/neutral */}
+      <ambientLight intensity={0.7} />
+      <directionalLight position={[10, 10, 5]} intensity={1.4} color="#ffffff" />
+      <directionalLight position={[-5, -5, -5]} intensity={0.5} color="#e0e8f0" />
+      <pointLight position={[0, 5, 0]} intensity={0.4} color="#f0f0ff" />
 
-      <Environment preset="studio" environmentIntensity={0.5} />
+      <Environment preset="studio" environmentIntensity={0.8} />
 
-      <group ref={groupRef} scale={aspectScale}>
+      <group ref={groupRef} scale={mobileCompression.groupScale}>
         {objectConfigs.map((config, i) => (
           <AnimatedBlob
             key={i}

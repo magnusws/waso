@@ -50,7 +50,7 @@ export default function Hero() {
       </nav>
 
       {/* Hero content — centered */}
-      <div className="relative z-10 pointer-events-none flex-1 flex flex-col items-center justify-center px-6 sm:px-10 text-center">
+      <div className="relative z-10 pointer-events-none flex-1 flex flex-col items-center justify-center px-6 sm:px-10 text-center pb-12 sm:pb-24">
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

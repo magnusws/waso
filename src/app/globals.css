@@ -5,17 +5,17 @@
   --font-editorial: 'Instrument Serif', Georgia, serif;
   --font-body: 'Plus Jakarta Sans', -apple-system, sans-serif;
 
-  --color-bg: #fff3d3;
-  --color-bg-warm: #ffebb0;
-  --color-bg-dark: #0f0e0d;
+  --color-bg: #f5f5f5;
+  --color-bg-warm: #ebebeb;
+  --color-bg-dark: #0a0a0a;
   --color-text: #000000;
-  --color-text-muted: rgba(0, 0, 0, 0.65);
+  --color-text-muted: rgba(0, 0, 0, 0.55);
   --color-text-light: rgba(0, 0, 0, 0.25);
   --color-accent: #000000;
   --color-accent-fg: #ffffff;
   --color-border: rgba(0, 0, 0, 0.08);
-  --color-border-dark: rgba(255, 243, 211, 0.1);
-  --color-overlay: rgba(33, 29, 29, 0.55);
+  --color-border-dark: rgba(245, 245, 245, 0.1);
+  --color-overlay: rgba(10, 10, 10, 0.55);
 }
 
 /* ─── Base — no scroll one-pager ─── */
@@ -48,12 +48,12 @@ body {
 /* ─── Typography utilities ─── */
 .font-editorial {
   font-family: var(--font-editorial);
-  text-shadow: 0 0 32px rgba(255, 243, 211, 0.95), 0 0 64px rgba(255, 243, 211, 0.6);
+  text-shadow: 0 0 32px rgba(245, 245, 245, 0.95), 0 0 64px rgba(245, 245, 245, 0.6);
 }
 
 .text-muted {
   color: var(--color-text-muted);
-  text-shadow: 0 0 24px rgba(255, 243, 211, 0.9), 0 0 48px rgba(255, 243, 211, 0.5);
+  text-shadow: 0 0 24px rgba(245, 245, 245, 0.9), 0 0 48px rgba(245, 245, 245, 0.5);
 }
 
 .text-light {
